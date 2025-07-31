@@ -1,0 +1,21 @@
+# Build binary
+websocket-server
+websocket-server.exe
+
+# Go modules
+go.sum
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
