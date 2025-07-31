@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/raihanakbr/meetingai-realtime-transcription/internal/websocket"
+	"github.com/raihanakbr/assemblyai-realtime-transcription/internal/websocket"
 )
 
 func main() {

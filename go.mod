@@ -1,4 +1,4 @@
-module github.com/raihanakbr/meetingai-realtime-transcription
+module github.com/raihanakbr/assemblyai-realtime-transcription
 
 go 1.23.0
 
