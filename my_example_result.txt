@@ -1,0 +1,133 @@
+3.52 - 5.52: Hey, Satya. I'm here and ready to dive in.
+6.16 - 6.32: All right.
+6.72 - 8.96: Hey, copilot. It's satya nadella here with steve.
+9.28 - 22.32: Ballmer and Bill Gates act as a high energy, engaging interviewer. As we celebrate Microsoft's first 50 years and kick off our 51st year, I want you to ask a lot of sharp, playful questions.
+22.88 - 24.24: Make it feel conversational.
+25.04 - 28.16: Feel free to get involved and opinionated yourself on our answers.
+28.80 - 30.88: And I also want you to only ask one of us.
+31.12 - 31.84: One question at a time.
+32.32 - 32.64: Kick us off.
+33.04 - 33.60: Copilot.
+35.04 - 35.20: Absolutely.
+36.08 - 37.52: Satya, let's get this party rolling.
+38.08 - 38.80: Steve, I'll start with you.
+39.52 - 45.76: Thinking back to your dynamic years at Microsoft, what's the most thrilling tech battle or competition you remember.
+46.48 - 47.60: And what did you learn from it?
+49.12 - 55.76: Well, it had to be in the competition with IBM to kind of body slam them, if you will, in the operating systems business.
+56.72 - 62.64: They were the big bad machine of years past. And they had this product which we had worked with Amana.
+62.80 - 63.04: To be be fair.
+63.52 - 64.48: Os 2. We had windows.
+65.20 - 69.76: And that was sort of a fight for all that essentially came afterward.
+70.72 - 71.84: And it was scary.
+73.60 - 74.08: It was a lot of fun.
+75.28 - 77.44: And it's not the last battle like that.
+78.00 - 79.44: Microsoft will face, I think.
+82.16 - 83.52: Steve. I love that fire.
+84.08 - 85.36: Now let's turn to Bill.
+85.92 - 91.28: You've been a visionary from day one. Looking back, which prediction or bet on the future?
+91.76 - 94.40: Are you most proud of getting right? And why?
+96.80 - 100.96: Well, Microsoft was basically a bet that software would be valuable.
+102.16 - 110.80: That it's the cost of computing went from very expensive to almost free, that it would give people a lot of great new tools.
+111.12 - 113.52: A lot of productivity to write software.
+114.00 - 122.96: And so we were never about any single software product. Although Windows and Office drove our success, we were about being really fast.
+123.92 - 131.76: Developing software and being good at hiring the best people and staying out in front of what that new computing allowed us to do.
+135.04 - 136.00: Betting on software is potential.
+137.04 - 145.12: Spot on. Now, Satya, you've been steering Microsoft through the AI and cloud era. What's the boldest vision you see for the next 50 years?
+145.84 - 146.56: And how do we get there?
+147.76 - 166.32: I think this idea that we can essentially make intelligence the first non durable computing product that everybody uses every day to feel smarter, more capable, more empowered, is the most exciting era of software.
+167.04 - 168.00: That we have to look forward to.
+168.40 - 177.12: So I'm really, really excited about what comes in the next 50 first year and the next 50 years as we make intelligence available to everybody in the world.
+178.56 - 182.00: In any forecast any of the three of us make for what's going to happen in 40 years.
+183.20 - 185.76: I guarantee you will at least have forgotten about him by that.
+189.04 - 189.36: True, steve.
+189.84 - 192.48: But it's that big picture thinking that shapes the future.
+193.60 - 196.32: Let's circle back, and I've got a playful one for Bill.
+197.12 - 198.72: If you could go back in time.
+199.04 - 201.60: And give your younger self one piece of advice.
+202.32 - 203.92: At Microsoft's early days.
+204.72 - 205.28: What would it be?
+207.44 - 210.88: Well, there was a lot of learning about how to grow the company.
+211.20 - 212.72: And bring in different skill sets.
+213.84 - 220.08: How to manage people. I certainly at first thought that engineering skill meant you would be good at other things.
+220.96 - 221.76: That turned out to be wrong.
+222.64 - 224.56: So we had to really build teams.
+225.60 - 226.00: In a more.
+228.56 - 229.84: Mixed diverse set of skills.
+230.24 - 230.88: Than I expected.
+232.24 - 238.88: I might tell my younger self, watch out for the government. You might have a little bit of tussle with them.
+240.00 - 251.12: I didn't anticipate that. I was pretty naive about not engaging in Washington, D.C. as soon as I should have learning curves.
+251.44 - 252.64: And government surprises.
+253.12 - 254.56: Definitely lessons for the ages.
+254.88 - 255.52: Now, saty.
+256.38 - 257.10: A forward thinking one for you.
+257.66 - 261.02: If you could invite any figure from history.
+261.66 - 264.14: To see the impact of Microsoft today.
+264.86 - 267.50: Who would it be and what would you show them first?
+269.90 - 279.02: I would invite, I would say maybe Newton and sort of have him say, does reasoning scale.
+280.06 - 284.38: And ask him the question and say, hey, give us sort of your point of view.
+284.86 - 285.50: On. What is this?
+285.66 - 285.74: Thing.
+287.02 - 288.94: Of reasoning using compute.
+289.10 - 289.82: And how does it scale?
+292.30 - 294.06: That'd be a brilliant meeting of mine.
+294.46 - 294.78: Satya.
+295.02 - 302.30: Newton exploring the frontiers of reasoning and intelligence through compute. That's a conversation for the history books.
+303.26 - 303.34: Steve.
+303.90 - 304.14: Your turn.
+304.70 - 309.18: If you could take Microsoft into any new industry or direction today.
+309.90 - 310.30: Where would you go?
+311.26 - 311.50: And why?
+313.98 - 318.14: Right now. There's so much opportunity with what's available with AI.
+319.90 - 326.78: It's hard to say. And I pushed Satya on this a few times. It drilling new oil wells.
+326.94 - 329.10: And looking more oil.
+329.82 - 333.18: At this stage, I think the key is actually to branch out.
+333.82 - 337.50: To get wider to use the core capability.
+338.22 - 343.98: And build all the adjacencies around the core. AI, you still have to keep digging deeper.
+344.62 - 346.70: But there's going to be so many applications.
+346.86 - 348.06: That push off of it.
+348.54 - 356.86: And enough of them are adjacent to what Microsoft's good at that I'd probably say you don't need too many more oil wells.
+357.02 - 359.18: But, man, you need to dig deeper and a little broader.
+360.06 - 361.82: Well, maybe. Copilot, you want to wrap it up?
+362.22 - 365.58: By asking. Or maybe Rose giving us each an AI roast.
+367.90 - 368.06: All right.
+368.62 - 369.66: Satya, let's spice it up.
+370.22 - 371.26: Steve will start with you.
+372.22 - 372.78: Your enthusiasm.
+372.94 - 373.82: Is legendary.
+374.30 - 383.10: But do you ever worry that your energy might short circuit the AI? I mean, even robots need a coffee break after your pep talks.
+383.26 - 385.10: Come. Come on, dude, if you can't handle me.
+385.26 - 388.46: You can't handle a huge percentage of the world's population.
+389.98 - 390.38: We're counting on you.
+394.78 - 395.02: Fair point.
+395.18 - 395.26: Steve.
+396.14 - 396.22: Now.
+396.94 - 399.02: Bill. You've got that signature, thoughtful gaze.
+399.58 - 408.06: But do you ever think the AI might feel intimidated by your intense thinking face? I mean, it's like it's waiting for a blue screen.
+408.22 - 408.30: Moment.
+411.34 - 411.74: I hope so.
+412.14 - 413.50: I mean, that's all I've got left.
+414.46 - 416.30: Is. These AIs get so damn intelligent.
+417.42 - 418.46: It's just that gaze.
+419.10 - 421.42: And my willingness to criticize that differentiates me.
+423.98 - 425.34: And it's a formidable gaze.
+425.82 - 425.90: Indeed.
+426.54 - 426.62: Bill.
+427.10 - 429.26: Copilot would you ever be willing to criticize him?
+431.50 - 431.66: Absolutely.
+432.54 - 434.54: Criticism is where growth happens.
+435.02 - 436.38: Now, satya.
+436.86 - 438.30: AI seems to be your best buddy.
+438.86 - 444.06: But ever worry that your deep passion for AI could one day have it running the show.
+444.86 - 447.10: Leaving you to just enjoy the ride.
+448.94 - 452.86: Well the day I can play like the best cricket player that I enjoy.
+453.66 - 455.02: That's the day it can run the show.
+455.34 - 456.14: As far as I'm concerned.
+458.70 - 459.42: Touche, satya.
+459.66 - 461.58: Let's see if it can hit a century in cricket.
+461.74 - 462.62: And then we'll talk.
+463.10 - 463.98: This has been a blast.
+464.30 - 464.46: Gentlemen.
+464.94 - 467.90: Here's to another 50 years of innovation and adventure.
+468.54 - 468.70: Cheers.
+469.50 - 470.14: Cheers. Cheers.
+471.90 - 474.14: Whatever that means to an AI. Is it drink?
