@@ -59,7 +59,7 @@ func HandleWebSocketConnection(w http.ResponseWriter, r *http.Request) {
 
 // API endpoint handlers
 
-// GetSessionHandler retrieves session information and transcripts
+// GetSessionHandler provides a health check for session status (no transcripts)
 func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -82,18 +82,33 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session.Mutex.RLock()
-	transcriptsCopy := make([]Transcript, len(session.Transcripts))
-	copy(transcriptsCopy, session.Transcripts)
-	session.Mutex.RUnlock()
 
-	// Create a response struct that omits the Mutex
+	// Create a health check response without transcripts
 	response := struct {
-		ID          string       `json:"id"`
-		Transcripts []Transcript `json:"transcripts"`
+		ID                 string  `json:"id"`
+		StartTime          string  `json:"start_time"`
+		EndTime            *string `json:"end_time,omitempty"`
+		TotalAudioDuration float64 `json:"total_audio_duration"`
+		Status             string  `json:"status"`
+		ErrorMessage       string  `json:"error_message,omitempty"`
+		TranscriptCount    int     `json:"transcript_count"`
+		IsActive           bool    `json:"is_active"`
 	}{
-		ID:          session.ID,
-		Transcripts: transcriptsCopy,
+		ID:                 session.ID,
+		StartTime:          session.StartTime.Format("2006-01-02T15:04:05Z07:00"),
+		TotalAudioDuration: session.TotalAudioDuration,
+		Status:             session.Status,
+		ErrorMessage:       session.ErrorMessage,
+		TranscriptCount:    len(session.Transcripts),
+		IsActive:           session.Status == "active",
 	}
+
+	// Handle EndTime formatting if it exists
+	if session.EndTime != nil {
+		endTimeStr := session.EndTime.Format("2006-01-02T15:04:05Z07:00")
+		response.EndTime = &endTimeStr
+	}
+	session.Mutex.RUnlock()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
@@ -124,13 +139,26 @@ func GetTranscriptsHandler(w http.ResponseWriter, r *http.Request) {
 	session.Mutex.RLock()
 	transcriptsCopy := make([]Transcript, len(session.Transcripts))
 	copy(transcriptsCopy, session.Transcripts)
-	session.Mutex.RUnlock()
 
 	response := map[string]interface{}{
-		"connection_id": connectionID,
-		"transcripts":   transcriptsCopy,
-		"count":         len(transcriptsCopy),
+		"connection_id":        connectionID,
+		"start_time":           session.StartTime.Format("2006-01-02T15:04:05Z07:00"),
+		"total_audio_duration": session.TotalAudioDuration,
+		"status":               session.Status,
+		"transcripts":          transcriptsCopy,
+		"count":                len(transcriptsCopy),
 	}
+
+	// Add end_time if session is completed
+	if session.EndTime != nil {
+		response["end_time"] = session.EndTime.Format("2006-01-02T15:04:05Z07:00")
+	}
+
+	// Add error message if exists
+	if session.ErrorMessage != "" {
+		response["error_message"] = session.ErrorMessage
+	}
+	session.Mutex.RUnlock()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
