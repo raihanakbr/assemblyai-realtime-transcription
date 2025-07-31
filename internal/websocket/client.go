@@ -1,4 +1,4 @@
-package main
+package websocket
 
 import (
 	"encoding/json"
@@ -14,93 +14,16 @@ import (
 	"github.com/oklog/ulid/v2"
 )
 
-// Configuration constants
-const (
-	APIKey        = "ASSEMBLY_AI_API_KEY" // Replace with your API key
-	AssemblyAIURL = "wss://streaming.assemblyai.com/v3/ws"
-	ServerPort    = ":8080"
-	SampleRate    = 16000
-	FormatTurns   = true
-
-	// Audio chunk configuration
-	MaxChunkDurationMs = 1000                                         // Maximum chunk duration in milliseconds (1000ms is the AssemblyAI limit)
-	MinChunkDurationMs = 50                                           // Minimum chunk duration in milliseconds
-	BytesPerSecond     = SampleRate * 2                               // 16kHz * 2 bytes per sample (16-bit)
-	MaxChunkSize       = (MaxChunkDurationMs * BytesPerSecond) / 1000 // ~32,000 bytes for 1000ms
-	MinChunkSize       = (MinChunkDurationMs * BytesPerSecond) / 1000 // ~1,600 bytes for 50ms
-)
-
-// WebSocket upgrader
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true // Allow connections from any origin
-	},
+type WebsocketDialer interface {
+	Dial(string, http.Header) (*websocket.Conn, *http.Response, error)
 }
-
-// Message types for AssemblyAI
-type BeginMessage struct {
-	ID        string    `json:"id"`
-	Type      string    `json:"type"`
-	ExpiresAt time.Time `json:"expires_at"`
-}
-
-type TurnMessage struct {
-	Type            string  `json:"type"`
-	Transcript      string  `json:"transcript"`
-	TurnIsFormatted bool    `json:"turn_is_formatted"`
-	Start           float64 `json:"start,omitempty"`
-	End             float64 `json:"end,omitempty"`
-	Text            string  `json:"text,omitempty"`
-	Words           []Word  `json:"words,omitempty"`
-}
-
-type Word struct {
-	Start      float64 `json:"start"`
-	End        float64 `json:"end"`
-	Text       string  `json:"text"`
-	Confidence float64 `json:"confidence,omitempty"`
-}
-
-type TerminationMessage struct {
-	Type                   string  `json:"type"`
-	AudioDurationSeconds   float64 `json:"audio_duration_seconds"`
-	SessionDurationSeconds float64 `json:"session_duration_seconds"`
-}
-
-type TerminateMessage struct {
-	Type string `json:"type"`
-}
-
-// Transcript represents a completed transcription segment
-type Transcript struct {
-	Text      string    `json:"text"`
-	Start     float64   `json:"start"`
-	End       float64   `json:"end"`
-	Timestamp time.Time `json:"timestamp"`
-}
-
-// SessionContext maintains persistent state for a connection
-type SessionContext struct {
-	ID                 string       `json:"id"`
-	StartTime          time.Time    `json:"start_time"`
-	EndTime            *time.Time   `json:"end_time,omitempty"`
-	TotalAudioDuration float64      `json:"total_audio_duration"`
-	Transcripts        []Transcript `json:"transcripts"`
-	Status             string       `json:"status"` // "active", "completed", "error"
-	ErrorMessage       string       `json:"error_message,omitempty"`
-	Mutex              sync.RWMutex `json:"-"`
-}
-
-// Global session store
-var (
-	sessionStore = make(map[string]*SessionContext)
-	storeMutex   = sync.RWMutex{}
-)
 
 // ClientConnection represents a client connected to our server
 type ClientConnection struct {
-	ID           string
-	ClientWS     *websocket.Conn
+	ID       string
+	ClientWS *websocket.Conn
+	// Dialer used to establish connections to AssemblyAI
+	Dialer       WebsocketDialer
 	AssemblyWS   *websocket.Conn
 	Mutex        sync.Mutex
 	Done         chan bool
@@ -111,8 +34,8 @@ type ClientConnection struct {
 	SessionCtx   *SessionContext // Reference to persistent session context
 }
 
-// NewClientConnection creates a new client connection
-func NewClientConnection(clientWS *websocket.Conn, connectionID string) *ClientConnection {
+// NewClientConnection creates a new client connection with injected WebsocketDialer
+func NewClientConnection(clientWS *websocket.Conn, connectionID string, dialer WebsocketDialer) *ClientConnection {
 	if connectionID == "" {
 		connectionID = ulid.Make().String()
 	}
@@ -123,6 +46,7 @@ func NewClientConnection(clientWS *websocket.Conn, connectionID string) *ClientC
 	return &ClientConnection{
 		ID:           connectionID,
 		ClientWS:     clientWS,
+		Dialer:       dialer,
 		Done:         make(chan bool),
 		AudioBuffer:  make([]byte, 0, MaxChunkSize*2), // Pre-allocate buffer
 		LastSentTime: time.Now(),
@@ -175,17 +99,21 @@ func (cc *ClientConnection) ConnectToAssemblyAI() error {
 
 	q := u.Query()
 	q.Set("sample_rate", fmt.Sprintf("%d", SampleRate))
-	q.Set("format_turns", "true")
+	q.Set("format_turns", fmt.Sprintf("%t", FormatTurns))
 	u.RawQuery = q.Encode()
 
 	log.Printf("Connecting to AssemblyAI with URL: %s", u.String())
 
-	// Set up headers
+	// Set up headers using environment variable
+	apiKey := os.Getenv(APIKeyEnvVar)
+	if apiKey == "" {
+		return fmt.Errorf("missing environment variable %s", APIKeyEnvVar)
+	}
 	headers := http.Header{}
-	headers.Set("Authorization", APIKey)
+	headers.Set("Authorization", apiKey)
 
 	// Connect to AssemblyAI
-	assemblyWS, _, err := websocket.DefaultDialer.Dial(u.String(), headers)
+	assemblyWS, _, err := cc.Dialer.Dial(u.String(), headers)
 	if err != nil {
 		return fmt.Errorf("failed to connect to AssemblyAI: %v", err)
 	}
@@ -495,152 +423,4 @@ func (cc *ClientConnection) Close() {
 	}
 
 	log.Printf("Closed connection for client %s (processed %.2fs of audio)", cc.ID, cc.TotalAudioMs/1000.0)
-}
-
-// handleWebSocketConnection handles a new WebSocket connection from a client
-func handleWebSocketConnection(w http.ResponseWriter, r *http.Request) {
-	// Upgrade HTTP connection to WebSocket
-	clientWS, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Printf("Failed to upgrade connection: %v", err)
-		return
-	}
-
-	// Get connection ID from query parameters
-	connectionID := r.URL.Query().Get("connection_id")
-
-	// Create client connection
-	client := NewClientConnection(clientWS, connectionID)
-	log.Printf("New client connected: %s", client.ID)
-
-	// Connect to AssemblyAI
-	if err := client.ConnectToAssemblyAI(); err != nil {
-		log.Printf("Failed to connect to AssemblyAI for client %s: %v", client.ID, err)
-		client.Close()
-		return
-	}
-
-	// Handle messages from client
-	go func() {
-		defer client.Close()
-
-		for {
-			messageType, data, err := clientWS.ReadMessage()
-			if err != nil {
-				log.Printf("Error reading from client %s: %v", client.ID, err)
-				break
-			}
-
-			switch messageType {
-			case websocket.BinaryMessage:
-				// Forward audio data to AssemblyAI
-				if err := client.HandleAudioData(data); err != nil {
-					log.Printf("Error handling audio data for client %s: %v", client.ID, err)
-				}
-			default:
-				log.Printf("Received unknown message type from client %s: %d", client.ID, messageType)
-			}
-		}
-	}()
-}
-
-// API endpoint handlers
-
-// getSessionHandler retrieves session information and transcripts
-func getSessionHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	connectionID := r.URL.Query().Get("connection_id")
-	if connectionID == "" {
-		http.Error(w, "connection_id parameter is required", http.StatusBadRequest)
-		return
-	}
-
-	storeMutex.RLock()
-	session, exists := sessionStore[connectionID]
-	storeMutex.RUnlock()
-
-	if !exists {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-
-	session.Mutex.RLock()
-	sessionCopy := *session
-	transcriptsCopy := make([]Transcript, len(session.Transcripts))
-	copy(transcriptsCopy, session.Transcripts)
-	sessionCopy.Transcripts = transcriptsCopy
-	session.Mutex.RUnlock()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(sessionCopy)
-}
-
-// getTranscriptsHandler retrieves only the transcripts for a session
-func getTranscriptsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	connectionID := r.URL.Query().Get("connection_id")
-	if connectionID == "" {
-		http.Error(w, "connection_id parameter is required", http.StatusBadRequest)
-		return
-	}
-
-	storeMutex.RLock()
-	session, exists := sessionStore[connectionID]
-	storeMutex.RUnlock()
-
-	if !exists {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-
-	session.Mutex.RLock()
-	transcriptsCopy := make([]Transcript, len(session.Transcripts))
-	copy(transcriptsCopy, session.Transcripts)
-	session.Mutex.RUnlock()
-
-	response := map[string]interface{}{
-		"connection_id": connectionID,
-		"transcripts":   transcriptsCopy,
-		"count":         len(transcriptsCopy),
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
-
-func main() {
-	// Set up WebSocket endpoint
-	http.HandleFunc("/", handleWebSocketConnection)
-
-	// Set up API endpoints
-	http.HandleFunc("/api/session", getSessionHandler)
-	http.HandleFunc("/api/transcripts", getTranscriptsHandler)
-
-	// Start server
-	log.Printf("Starting WebSocket server on port %s", ServerPort)
-	log.Printf("WebSocket endpoint: ws://localhost%s", ServerPort)
-	log.Printf("API endpoints:")
-	log.Printf("  GET /api/session?connection_id=<id> - Get session details")
-	log.Printf("  GET /api/transcripts?connection_id=<id> - Get transcripts only")
-	log.Printf("Example client connection: ws://localhost%s?connection_id=test123", ServerPort)
-	log.Printf("Configuration: SampleRate=%d, FormatTurns=%t", SampleRate, FormatTurns)
-
-	// Check if API key is set
-	APIKey := os.Getenv("ASSEMBLY_AI_API_KEY")
-	if APIKey == "" {
-		log.Fatal("ASSEMBLY_AI_API_KEY environment variable is required")
-	}
-
-	// Start the server
-	if err := http.ListenAndServe(ServerPort, nil); err != nil {
-		log.Fatalf("Server failed to start: %v", err)
-	}
 }
