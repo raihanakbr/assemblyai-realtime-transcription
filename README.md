@@ -58,6 +58,11 @@ A high-performance Go WebSocket server that provides real-time audio transcripti
 
 Create a `.env` file in the project root or set these environment variables:
 
+```bash
+# Copy the example file and edit it
+cp .env.example .env
+```
+
 | Variable              | Required | Description             | Default |
 | --------------------- | -------- | ----------------------- | ------- |
 | `ASSEMBLY_AI_API_KEY` | **Yes**  | Your AssemblyAI API key | -       |
@@ -94,8 +99,11 @@ go run cmd/server/main.go
 ### Using a .env File
 
 ```bash
-# Create .env file
-echo "ASSEMBLY_AI_API_KEY=your_api_key_here" > .env
+# Copy the example file and edit with your API key
+cp .env.example .env
+
+# Edit the .env file with your actual API key
+# ASSEMBLY_AI_API_KEY=your_actual_api_key_here
 
 # Run the server
 go run cmd/server/main.go
