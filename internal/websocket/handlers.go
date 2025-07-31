@@ -82,14 +82,21 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session.Mutex.RLock()
-	sessionCopy := *session
 	transcriptsCopy := make([]Transcript, len(session.Transcripts))
 	copy(transcriptsCopy, session.Transcripts)
-	sessionCopy.Transcripts = transcriptsCopy
 	session.Mutex.RUnlock()
 
+	// Create a response struct that omits the Mutex
+	response := struct {
+		ID          string       `json:"id"`
+		Transcripts []Transcript `json:"transcripts"`
+	}{
+		ID:          session.ID,
+		Transcripts: transcriptsCopy,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(sessionCopy)
+	json.NewEncoder(w).Encode(response)
 }
 
 // GetTranscriptsHandler retrieves only the transcripts for a session
